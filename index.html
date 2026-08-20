@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ElyaShop</title>
+  <meta name="description" content="ElyaShop — каталог обуви и новинок">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="logo" href="/">ElyaShop</a>
+    <div class="search">
+      <input id="search" type="search" placeholder="Поиск по модели, бренду, размеру…" autocomplete="off">
+    </div>
+    <div class="count" id="count">Загрузка…</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="kicker">КАТАЛОГ</div>
+      <h1>Найди свою пару.</h1>
+      <p>Каталог ElyaShop. Фото загружаются напрямую из источника только по мере просмотра.</p>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <select id="sort">
+      <option value="default">Сначала новые</option>
+      <option value="name">По названию</option>
+      <option value="photos">Больше фото</option>
+    </select>
+    <button id="reset">Сбросить</button>
+  </section>
+
+  <div id="status" class="status">Загрузка каталога…</div>
+  <section id="grid" class="grid"></section>
+
+  <nav class="pagination">
+    <button id="prev">← Назад</button>
+    <span id="page"></span>
+    <button id="next">Вперёд →</button>
+  </nav>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="backdrop" data-close></div>
+  <article class="product-modal">
+    <button class="close" data-close>×</button>
+    <div class="product-layout">
+      <div>
+        <div class="main-image-box">
+          <img id="mainImage" alt="">
+        </div>
+        <div id="thumbs" class="thumbs"></div>
+      </div>
+      <div class="product-info">
+        <div class="kicker">ELYA SHOP</div>
+        <h2 id="productTitle"></h2>
+        <div id="productPrice" class="product-price"></div>
+        <div id="productSizes" class="sizes"></div>
+        <p id="productMeta" class="muted"></p>
+        <a id="sourceLink" class="primary" target="_blank" rel="noopener noreferrer">Открыть исходный товар</a>
+      </div>
+    </div>
+  </article>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
