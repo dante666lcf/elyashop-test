@@ -1,49 +1,28 @@
-
-const state={all:[],filtered:[],page:1,perPage:40,chunkCache:new Map()};
+const state={all:[],filtered:[],page:1,perPage:40};
 const $=id=>document.getElementById(id);
 const els={grid:$('grid'),status:$('status'),search:$('search'),sort:$('sort'),reset:$('reset'),count:$('count'),prev:$('prev'),next:$('next'),page:$('page'),modal:$('modal'),mainImage:$('mainImage'),thumbs:$('thumbs'),productTitle:$('productTitle'),productPrice:$('productPrice'),productSizes:$('productSizes'),productMeta:$('productMeta'),sourceLink:$('sourceLink')};
 
+const translatedTitles=["Nike P-6000 — коллекция расцветок.","SL 72 — в наличии.","Лёгкие марафонские беговые кроссовки для скоростных тренировок — фото реального товара.","adidas Adizero Evo SL 2 — марафонские беговые кроссовки. В наличии.","Evo SL ATR M — водонепроницаемые беговые кроссовки для марафона с комфортной посадкой. В наличии.","adidas SL 72 PRO — ретро-кроссовки на толстой подошве. В наличии.","adidas UB21 — повседневные беговые кроссовки с амортизацией по всей длине подошвы. В наличии.","Ultra Boost — повседневные кроссовки с трикотажным верхом носочного типа. В наличии.","Nike Air Zoom Pegasus 42 — оригинальная комплектация, фирменная коробка и аксессуары.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с передним Zoom Air, полноразмерной амортизацией React, инженерной сеткой и системой Flywire. В наличии, в оригинальной коробке. Размеры: 39–46.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с передним Zoom Air, полноразмерной амортизацией React, дышащим инженерным сетчатым верхом и фиксацией Flywire. Размеры: 39, 40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45, 46.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с передним Zoom Air, полноразмерной амортизацией React, дышащим инженерным сетчатым верхом и системой Flywire. В наличии. Размеры: 36–46.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с амортизацией Zoom Air и React, верхом из инженерной сетки и фиксацией Flywire. В наличии. Размеры: 39–46.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с амортизацией Zoom Air в передней части и React по всей длине подошвы, дышащим инженерным сетчатым верхом и фиксацией Flywire. В наличии. Размеры: 36–42.5.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с амортизацией Zoom Air и React, верхом из инженерной сетки и фиксацией Flywire. В наличии, размеры: 36–42.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с амортизацией Zoom Air и React, сетчатым верхом и системой Flywire. В наличии. Размеры: 39, 40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45, 46.","Nike Air Zoom Pegasus 42 — марафонские беговые кроссовки с верхом из инженерной сетки, Zoom Air, полноразмерной амортизацией React и фиксацией Flywire. В наличии. Размеры: 36–46.","530 — премиальная версия, в наличии.","New Balance 530 — классические ретро-беговые кроссовки. Артикул: U530SUB. Размеры: 36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41.5, 42, 42.5, 43, 44, 44.5, 45.","New Balance 530 MR530FB1 — классические ретро-беговые кроссовки. Размеры: 36–45 (36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41.5, 42, 42.5, 43, 44, 44.5, 45).","New Balance 530 MR530SD — классические ретро-кроссовки. Размеры: 36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41.5, 42, 42.5, 43, 44, 44.5, 45.","New Balance 530 MR530FW1 — классические ретро-беговые кроссовки с многослойным верхом. Размеры: 36–45 (в наличии 37.5, 38.5, 40.5, 41.5, 42.5, 44.5).","New Balance 530 (MR530EWB) — ретро-беговые кроссовки. Размеры: 36–45 (36, 37, 37.5, 38, 38.5, 39, 40, 40.5, 41.5, 42, 42.5, 43, 44, 44.5, 45).","New Balance 530 MR530USX — классические ретро-беговые кроссовки с лаконичным дизайном. Размеры: 36–45.","New Balance 530 — классические ретро-кроссовки с обновлённым дизайном. Артикул: MR530ASM. Размеры: 36–45.","New Balance 530 — классические ретро-кроссовки с обновлённым дизайном. Артикул: U530SUA. Размеры: 36–45.","CHANGLE — классические спортивные кроссовки. В наличии.","adidas SAMBA OG MULE W — кроссовки-мюли без задника. В наличии.","adidas Originals TOKYO — лимитированные туфли Мэри Джейн. В наличии.","Балетные туфли второго поколения — в наличии.","Кеды-слипоны в стиле Мэри Джейн — в наличии.","Originals Anfu Trainers — повседневная ретро-обувь в стиле Mary Jane. В наличии.","Taekwondo 1-го поколения — в наличии.","adidas Samba OG — кроссовки с пайетками и стразами. В наличии.","Antelope New German Trainer — кеды в стиле немецких тренировочных, в наличии.","OOS — подборка скейтбордических кед.","New Balance MR740 — ретро-кроссовки унисекс для бега трусцой с верхом из лёгкой воловьей кожи и воздухопроницаемой сетки, технологией T-Beam, поддержкой свода стопы и открытым гелевым амортизатором в пятке. Серо-голубая расцветка с эффектом состаривания, размеры 36–45, включая половинные.","Nike P-6000 CNPT0 «Silver/Laser Fuchsia» — ретро-кроссовки в стиле dad sneakers для повседневной носки, с трёхслойной подошвой. Артикул: IF1787-100. Размеры: 36–45.","adidas Originals SL 72 Pro — ретро-кроссовки на мягкой пенистой подошве. Размеры: 36–42, включая половинные размеры.","adidas Originals SL 72 PRO — ретро-кроссовки на мягкой вспененной подошве с утолщённой подошвой. Размеры: 39–45, включая половинные.","adidas SL 72 Pro — ретро-кроссовки Originals на толстой подошве с мягкой пеной. Размеры: 36–45, включая половинные.","adidas Originals SL 72 Pro — ретро-кроссовки на мягкой пенистой подошве. Размеры: 36–45, включая половинные.","adidas Originals SL 72 Pro — ретро-кроссовки на толстой подошве с мягкой пеной. Размеры: 36–45, включая половинные.","adidas Originals SL 72 Pro — ретро-кроссовки на толстой подошве из мягкого вспененного материала. Размеры: 36–45, включая половинные.","adidas Originals SL 72 Pro — ретро-кроссовки для повседневной носки с мягкой пеновой подошвой. Размеры: 36–45, включая половинные.","Jordan Air Jordan 1 Element Gore-Tex — мужские низкие кроссовки для бега и походов. В наличии. Размеры: 39, 40, 40.5, 41, 42, 42.5, 43, 44, 44.5, 45.","Jordan Air Jordan 1 Element Gore-Tex — мужские низкие кроссовки для бега и походов. В наличии. Размеры: 39–45, включая 40.5, 42.5 и 44.5.","Jordan Air Jordan 1 Element Gore-Tex — мужские низкие кроссовки для хайкинга и бега, классическая износостойкая модель. В наличии. Размеры: 39–45, включая 40.5, 42.5 и 44.5.","Подборка туфель «Мэри Джейн»","adidas SAMBA Jane W — женские туфли Мэри Джейн с комбинированным кожаным верхом, носком-ракушкой и цельной резиновой подошвой. В наличии. Размеры: 35.5, 36, 36.5, 37.5, 38, 38.5, 39, 40, 40.5, 41.","On Cloudsurfer 2 — новая модель 2025 года, лёгкие дышащие унисекс-кроссовки с верхом из жаккардовой сетки и противоскользящей износостойкой подошвой. Размеры: 36–40.","On Cloudsurfer 2 — лёгкие дышащие унисекс-кроссовки с жаккардовым сетчатым верхом и нескользящей износостойкой подошвой. Размеры: 36–45.","On Cloudsurfer 2 — новые лёгкие дышащие кроссовки 2025 года с жаккардовым сетчатым верхом, противоскользящей износостойкой подошвой; унисекс. Размеры: 36–45.","ON Cloudsurfer 2 — лёгкие дышащие кроссовки унисекс 2025 года с верхом из жаккардовой сетки и нескользящей износостойкой подошвой. Размеры: 36–45.","LOEWE x On CloudSolo — коллаборационные кроссовки с быстрой шнуровкой и фирменным фиксатором в форме гальки. Размеры: 36–45.","LOEWE x On CloudSolo — 8-й выпуск коллаборации, новая модель с быстрой шнуровкой и фирменными пуговицами в форме гальки. Размеры: 36–45.","LOEWE x On Running CloudSolo — восьмой выпуск коллаборации с быстрой шнуровкой и фирменной пуговицей в форме гальки. Размеры: 36–45.","LOEWE x On Running CloudSolo — 8-я совместная коллекция, новая модель с быстрой шнуровкой и фирменной пуговицей в форме гальки. Размеры: 36–45.","LOEWE x On Cloudtilt — лёгкие дышащие кроссовки унисекс с амортизацией для повседневной носки. Размеры: 36–45.","LOEWE x On Cloudtilt — лёгкие, амортизирующие и дышащие унисекс-кроссовки для повседневной носки. Размеры: 36–45.","LOEWE x On Cloudtilt — лёгкие, амортизирующие и дышащие повседневные кроссовки унисекс. Размеры: 36–45.","ON Cloudtilt — лёгкие дышащие кроссовки унисекс для бега и повседневной носки, с амортизацией и износостойкой нескользящей подошвой. Размеры: 36–46.","ON Cloudtilt — лёгкие дышащие кроссовки унисекс с амортизацией, нескользящей износостойкой подошвой для бега и повседневной носки. Размеры: 36–46 (включая 36.5, 38.5, 40.5, 42.5, 44.5).","LOEWE x On CloudSolo — коллаборация с быстрой шнуровкой и фирменной пуговицей в форме гальки. Размеры: 36–45.","ON Cloudtilt Remix — лёгкие дышащие кроссовки с комфортной амортизацией для спорта и повседневной носки, унисекс. Размеры: 36–43.","ON Cloudtilt Remix — лёгкие дышащие кроссовки с амортизацией для спорта и повседневной носки, унисекс. Размеры: 36–46.","On Cloudtilt Remix — лёгкие дышащие кроссовки унисекс с амортизацией для спорта и повседневной носки. Размеры: 36–46.","ON Cloudtilt Remix — лёгкие дышащие кроссовки с комфортной амортизацией для спорта и повседневной носки, унисекс. Размеры: 36–46.","On Cloudtilt Remix — лёгкие дышащие спортивные кроссовки с комфортной амортизацией для мужчин и женщин. Размеры: 36–46.","ON Cloudtilt Remix — лёгкие дышащие спортивно-повседневные кроссовки с амортизацией для мужчин и женщин. Размеры: 36–46.","On Cloudtilt Remix — лёгкие амортизирующие и дышащие кроссовки унисекс для спорта и повседневной носки. Размеры: 36–46.","ON Cloudtilt Remix — лёгкие дышащие кроссовки с комфортной амортизацией для спорта и повседневной носки, унисекс. Размеры: 36–46.","New Balance Ellipse v1 XS# — лёгкие низкие беговые кроссовки для марафона с дышащим текстильным сетчатым верхом и нескользящей износостойкой подошвой.","New Balance Ellipse v1 — лёгкие низкие беговые кроссовки для марафона с дышащим сетчатым верхом и износостойкой нескользящей подошвой. Размеры: 36, 37.5, 38, 38.5, 39.5, 40, 41.5, 42.","New Balance Ellipse v1 — лёгкие низкие марафонские беговые кроссовки с текстильным сетчатым верхом, дышащие, нескользящие и износостойкие. Размеры: 36, 37.5, 38, 38.5, 39.5, 40, 41.5, 42.","New Balance Ellipse v1 XS — лёгкие низкие кроссовки для марафонского бега с дышащим сетчатым верхом и противоскользящей износостойкой подошвой. Размеры: 36, 37.5, 38, 39.5, 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","New Balance Ellipse v1 XS — лёгкие низкие беговые кроссовки с текстильным сетчатым верхом, противоскользящей и износостойкой подошвой. Размеры: 36, 37.5, 38, 39.5, 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","XS New Balance Ellipse v1 — лёгкие низкие марафонские кроссовки с дышащим текстильным сетчатым верхом и нескользящей износостойкой подошвой. Размеры: 36, 37.5, 38, 39.5, 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","New Balance Ellipse v1 XS — лёгкие низкие марафонские кроссовки с дышащим текстильным верхом и нескользящей износостойкой подошвой. Размеры: 36, 37.5, 38, 39.5, 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","New Balance Ellipse v1 XS — лёгкие низкие беговые кроссовки для марафона с сетчатым верхом, дышащие, устойчивые к скольжению и износу. Размеры: 36, 37.5, 38, 39.5, 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","New Balance Ellipse v1 XS — лёгкие низкие беговые кроссовки с текстильным сетчатым верхом, противоскользящей износостойкой подошвой. Размеры: 40–45.","New Balance Ellipse v1 — лёгкие низкие беговые кроссовки для марафона с дышащим текстильным сетчатым верхом и нескользящей износостойкой подошвой. Размеры: 40, 40.5, 41.5, 42, 42.5, 43, 44, 45.","Nike Vomero Premium — лёгкие унисекс-кроссовки с низким профилем для повседневной носки и лёгкого бега. Верх из эластичной инженерной сетки, амортизация ZoomX и Air Zoom, износостойкая противоскользящая резиновая подошва.","Nike Vomero Premium — мужские и женские беговые кроссовки с верхом из эластичной инженерной сетки, амортизацией ZoomX и Air Zoom, износостойкой резиновой подошвой. Размеры: 36, 37.5, 38, 38.5, 39, 40, 41, 42.","Nike Vomero Premium — мужские и женские лёгкие беговые кроссовки на толстой подошве с амортизацией ZoomX и Air Zoom, эластичным сетчатым верхом и износостойкой резиновой подошвой. Размеры: 36–46.","Nike Vomero Premium — унисекс-кроссовки для бега и повседневной носки с верхом из эластичной инженерной сетки, амортизацией ZoomX и Air Zoom, лёгкой высокой подошвой и износостойкой противоскользящей резиной. Размеры: 39, 40, 40.5, 41, 42, 42.5, 43, 44, 45, 46.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — лёгкие беговые кроссовки с дышащим сетчатым верхом, амортизирующей пеной ReactX и износостойкой противоскользящей резиновой подошвой. Размеры: 36–41.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые кроссовки с дышащим сетчатым верхом, полноразмерной пеной ReactX и износостойкой противоскользящей резиновой подошвой. Размеры: 36–42.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые и повседневные кроссовки с лёгким дышащим сетчатым верхом, пеной ReactX по всей длине и износостойкой противоскользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые и повседневные кроссовки с двухслойным дышащим сетчатым верхом, амортизацией ReactX и износостойкой нескользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — лёгкие беговые и повседневные кроссовки с двухслойным сетчатым верхом, полноразмерной амортизацией ReactX и износостойкой нескользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые кроссовки для марафона и повседневной носки с дышащим сетчатым верхом, полноразмерной пеной ReactX и износостойкой нескользящей резиновой подошвой. Размеры: 36–45.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые и повседневные кроссовки с дышащим двухслойным сетчатым верхом, вставками из формоустойчивой пены, полноразмерной промежуточной подошвой ReactX и износостойкой противоскользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые и повседневные кроссовки с двухслойным дышащим сетчатым верхом, амортизацией ReactX по всей длине и износостойкой нескользящей резиновой подошвой. Размеры: 36, 37, 38, 39, 40, 40.5, 41, 42, 42.5, 43, 44, 45.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые кроссовки для марафона и повседневной носки с двухслойным дышащим сетчатым верхом, амортизацией ReactX и износостойкой нескользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","Nike Air Zoom Pegasus 42 Premium «Lilac Bloom» — беговые кроссовки с лёгким дышащим сетчатым верхом, амортизацией ReactX и износостойкой нескользящей резиновой подошвой. Размеры: 36–45, включая 40.5 и 42.5.","On X4 — подборка расцветок.","On Cloudpulse Next — универсальные кроссовки для тренировок, длительных пробежек, лёгких походов и повседневной носки с амортизацией CloudTec Phase, пеной Helion и перепадом 6 мм. Лёгкий дышащий верх из инженерной сетки. Размеры: 36–45, без половинных размеров.","On Cloudpulse Next — универсальные кроссовки для тренировок, лёгкого бега и повседневной носки с амортизацией CloudTec Phase, пеной Helion и дышащим сетчатым верхом. Перепад 6 мм. Размеры: 36–45, без половинных размеров.","On Cloudpulse Next — комфортные кроссовки для повседневных тренировок, лёгкого бега и прогулок с технологиями CloudTec Phase и Helion, перепадом 6 мм и дышащим сетчатым верхом. В наличии. Размеры: 36–45, без половинных размеров."];
+
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const img=e.target;
-      if(img.dataset.src&&!img.src){
-        img.src=img.dataset.src;
-        img.onload=()=>img.classList.add('loaded');
-      }
-      observer.unobserve(img);
-    }
-  })
-},{rootMargin:'350px'});
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const img=e.target;if(img.dataset.src&&!img.src){img.src=img.dataset.src;img.onload=()=>img.classList.add('loaded')}observer.unobserve(img)}})},{rootMargin:'350px'});
 
 function render(){
   const start=(state.page-1)*state.perPage;
   const items=state.filtered.slice(start,start+state.perPage);
   els.grid.innerHTML='';
   els.status.textContent=items.length?'':'Ничего не найдено';
-
   items.forEach(item=>{
+    const firstImage=(item.images&&item.images[0])||'';
     const card=document.createElement('article');
     card.className='card';
-    card.innerHTML=`
-      <div class="pic">
-        <img alt="" loading="lazy" data-src="${esc(item.first_image)}">
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">${esc(item.title||'Товар')}</h3>
-        <div class="card-row">
-          <span>${item.price?esc(item.price):'Цена по запросу'}</span>
-          <span>${item.image_count||0} фото</span>
-        </div>
-      </div>`;
+    card.innerHTML=`<div class="pic"><img alt="" loading="lazy" data-src="${esc(firstImage)}"></div><div class="card-body"><h3 class="card-title">${esc(item.title||'Товар')}</h3><div class="card-row"><span>${item.price?esc(item.price):'Цена по запросу'}</span><span>${item.image_count||(item.images?.length||0)} фото</span></div></div>`;
     card.addEventListener('click',()=>openProduct(item));
     els.grid.appendChild(card);
     const img=card.querySelector('img');
-    if(item.first_image) observer.observe(img);
+    if(firstImage) observer.observe(img);
   });
-
   const pages=Math.max(1,Math.ceil(state.filtered.length/state.perPage));
   els.page.textContent=`${state.page} / ${pages}`;
   els.prev.disabled=state.page<=1;
@@ -53,74 +32,40 @@ function render(){
 
 function apply(){
   const q=els.search.value.trim().toLowerCase();
-  state.filtered=state.all.filter(x=>{
-    const hay=`${x.title||''} ${x.id||''} ${x.sizes||''}`.toLowerCase();
-    return hay.includes(q);
-  });
+  state.filtered=state.all.filter(x=>`${x.title||''} ${x.goods_id||''} ${x.sizes||''}`.toLowerCase().includes(q));
   if(els.sort.value==='name') state.filtered.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
   else if(els.sort.value==='photos') state.filtered.sort((a,b)=>(b.image_count||0)-(a.image_count||0));
   else state.filtered.sort((a,b)=>state.all.indexOf(a)-state.all.indexOf(b));
-  state.page=1; render();
+  state.page=1;render();
 }
 
-async function getChunk(no){
-  if(state.chunkCache.has(no)) return state.chunkCache.get(no);
-  const r=await fetch(`/data/chunks/${String(no).padStart(4,'0')}.json`);
-  if(!r.ok) throw new Error('Не удалось загрузить товар');
-  const data=await r.json();
-  state.chunkCache.set(no,data);
-  return data;
+function openProduct(p){
+  const images=p.images||[];
+  els.productTitle.textContent=p.title||'Товар';
+  els.productPrice.textContent=p.price||'Цена по запросу';
+  els.productSizes.textContent=p.sizes?`Размеры: ${p.sizes}`:'';
+  els.productMeta.textContent=`${p.image_count||images.length||0} фото${p.goods_id?' · ID '+p.goods_id:''}`;
+  els.sourceLink.href=p.url||'#';
+  els.thumbs.innerHTML='';
+  els.mainImage.src=images[0]||'';
+  images.forEach((src,i)=>{const img=document.createElement('img');img.loading='lazy';img.src=src;if(i===0)img.classList.add('active');img.onclick=()=>{els.mainImage.src=src;els.thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));img.classList.add('active')};els.thumbs.appendChild(img)});
+  els.modal.classList.remove('hidden');document.body.style.overflow='hidden';
 }
 
-async function openProduct(meta){
-  try{
-    const chunk=await getChunk(meta.chunk);
-    const p=chunk[meta.offset];
-    const images=p.images||[];
-    els.productTitle.textContent=p.title||'Товар';
-    els.productPrice.textContent=p.price||'Цена по запросу';
-    els.productSizes.textContent=p.sizes?`Размеры: ${p.sizes}`:'';
-    els.productMeta.textContent=`${p.image_count||images.length||0} фото${p.goods_id?' · ID '+p.goods_id:''}`;
-    els.sourceLink.href=p.url||'#';
-
-    els.thumbs.innerHTML='';
-    els.mainImage.src=images[0]||'';
-    images.forEach((src,i)=>{
-      const img=document.createElement('img');
-      img.loading='lazy';
-      img.src=src;
-      if(i===0) img.classList.add('active');
-      img.onclick=()=>{
-        els.mainImage.src=src;
-        els.thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
-        img.classList.add('active');
-      };
-      els.thumbs.appendChild(img);
-    });
-
-    els.modal.classList.remove('hidden');
-    document.body.style.overflow='hidden';
-  }catch(e){alert(e.message)}
-}
 function closeModal(){els.modal.classList.add('hidden');document.body.style.overflow=''}
-
-els.search.addEventListener('input',apply);
-els.sort.addEventListener('change',apply);
-els.reset.onclick=()=>{els.search.value='';els.sort.value='default';apply()};
-els.prev.onclick=()=>{if(state.page>1){state.page--;render();scrollTo({top:0,behavior:'smooth'})}};
-els.next.onclick=()=>{const pages=Math.ceil(state.filtered.length/state.perPage);if(state.page<pages){state.page++;render();scrollTo({top:0,behavior:'smooth'})}};
-document.querySelectorAll('[data-close]').forEach(x=>x.onclick=closeModal);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+els.search.addEventListener('input',apply);els.sort.addEventListener('change',apply);els.reset.onclick=()=>{els.search.value='';els.sort.value='default';apply()};els.prev.onclick=()=>{if(state.page>1){state.page--;render();scrollTo({top:0,behavior:'smooth'})}};els.next.onclick=()=>{const pages=Math.ceil(state.filtered.length/state.perPage);if(state.page<pages){state.page++;render();scrollTo({top:0,behavior:'smooth'})}};document.querySelectorAll('[data-close]').forEach(x=>x.onclick=closeModal);document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
 (async()=>{
   try{
-    const r=await fetch('/data/index.json');
-    if(!r.ok) throw new Error('index.json не найден');
-    state.all=await r.json();
+    const r=await fetch('/data/chunks/0000.json',{cache:'no-store'});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const raw=await r.json();
+    state.all=raw.slice(0,translatedTitles.length).map((item,i)=>({...item,title:translatedTitles[i]}));
     state.filtered=[...state.all];
     els.status.textContent='';
     render();
   }catch(e){
-    els.status.innerHTML=`Ошибка загрузки каталога: ${esc(e.message)}`;
+    console.error(e);
+    els.status.textContent='Каталог временно недоступен. Обновите страницу.';
   }
 })();
