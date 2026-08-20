@@ -63,12 +63,23 @@
         <div id="productPrice" class="product-price"></div>
         <div id="productSizes" class="sizes"></div>
         <p id="productMeta" class="muted"></p>
-        <a id="sourceLink" class="primary" target="_blank" rel="noopener noreferrer">Открыть исходный товар</a>
+        <a id="sourceLink" class="primary" href="https://wa.me/77019991800" target="_blank" rel="noopener noreferrer">Написать в WhatsApp</a>
       </div>
     </div>
   </article>
 </div>
 
 <script src="/app.js"></script>
+<script>
+  const whatsappButton = document.getElementById('sourceLink');
+  whatsappButton.addEventListener('click', function (event) {
+    event.preventDefault();
+    const productTitle = document.getElementById('productTitle').textContent.trim();
+    const message = productTitle
+      ? `Здравствуйте! Хочу узнать о товаре: ${productTitle}`
+      : 'Здравствуйте! Хочу узнать о товаре.';
+    window.open(`https://wa.me/77019991800?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+  });
+</script>
 </body>
 </html>
