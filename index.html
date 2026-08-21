@@ -11,75 +11,34 @@
 <header class="topbar">
   <div class="wrap topbar-inner">
     <a class="logo" href="/">ElyaShop</a>
-    <div class="search">
-      <input id="search" type="search" placeholder="Поиск по модели, бренду, размеру…" autocomplete="off">
-    </div>
+    <div class="search"><input id="search" type="search" placeholder="Поиск по модели, бренду, размеру…" autocomplete="off"></div>
     <div class="count" id="count">Загрузка…</div>
   </div>
 </header>
-
 <main class="wrap">
-  <section class="hero">
-    <div>
-      <div class="kicker">КАТАЛОГ</div>
-      <h1>Найди свою пару.</h1>
-      <p>ELYA SHOP</p>
-    </div>
+  <section class="hero"><div><div class="kicker">КАТАЛОГ</div><h1>Найди свою пару.</h1><p>ELYA SHOP</p></div></section>
+  <section class="brands-section" aria-label="Выбор бренда">
+    <div class="brands-label">БРЕНДЫ</div>
+    <div id="brands" class="brands"></div>
   </section>
-
-  <section class="toolbar">
-    <select id="sort">
-      <option value="default">Сначала новые</option>
-      <option value="name">По названию</option>
-      <option value="photos">Больше фото</option>
-    </select>
-    <button id="reset">Сбросить</button>
-  </section>
-
   <div id="status" class="status">Загрузка каталога…</div>
   <section id="grid" class="grid"></section>
-
-  <nav class="pagination">
-    <button id="prev">← Назад</button>
-    <span id="page"></span>
-    <button id="next">Вперёд →</button>
-  </nav>
+  <nav class="pagination"><button id="prev">← Назад</button><span id="page"></span><button id="next">Вперёд →</button></nav>
 </main>
-
 <div id="modal" class="modal hidden">
   <div class="backdrop" data-close></div>
   <article class="product-modal">
     <button class="close" data-close>×</button>
     <div class="product-layout">
-      <div>
-        <div class="main-image-box">
-          <img id="mainImage" alt="">
-        </div>
-        <div id="thumbs" class="thumbs"></div>
-      </div>
-      <div class="product-info">
-        <div class="kicker">ELYA SHOP</div>
-        <h2 id="productTitle"></h2>
-        <div id="productPrice" class="product-price"></div>
-        <div id="productSizes" class="sizes"></div>
-        <p id="productMeta" class="muted"></p>
-        <a id="sourceLink" class="primary" href="https://wa.me/77019991800" target="_blank" rel="noopener noreferrer">Написать в WhatsApp</a>
-      </div>
+      <div><div class="main-image-box"><img id="mainImage" alt=""></div><div id="thumbs" class="thumbs"></div></div>
+      <div class="product-info"><div class="kicker">ELYA SHOP</div><h2 id="productTitle"></h2><div id="productPrice" class="product-price"></div><div id="productSizes" class="sizes"></div><p id="productMeta" class="muted"></p><a id="sourceLink" class="primary" href="https://wa.me/77019991800" target="_blank" rel="noopener noreferrer">Написать в WhatsApp</a></div>
     </div>
   </article>
 </div>
-
 <script src="/app.js"></script>
 <script>
-  const whatsappButton = document.getElementById('sourceLink');
-  whatsappButton.addEventListener('click', function (event) {
-    event.preventDefault();
-    const productTitle = document.getElementById('productTitle').textContent.trim();
-    const message = productTitle
-      ? `Здравствуйте! Хочу узнать о товаре: ${productTitle}`
-      : 'Здравствуйте! Хочу узнать о товаре.';
-    window.open(`https://wa.me/77019991800?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
-  });
+const whatsappButton=document.getElementById('sourceLink');
+whatsappButton.addEventListener('click',function(event){event.preventDefault();const productTitle=document.getElementById('productTitle').textContent.trim();const message=productTitle?`Здравствуйте! Хочу узнать о товаре: ${productTitle}`:'Здравствуйте! Хочу узнать о товаре.';window.open(`https://wa.me/77019991800?text=${encodeURIComponent(message)}`,'_blank','noopener');});
 </script>
 </body>
 </html>
