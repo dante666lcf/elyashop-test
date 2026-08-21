@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Rebuild ElyaShop static data from catalog.json / catalog_ru.json.
+Rebuild ElyaShop static data from catalog_ru.json.
 
 Usage:
     python build_catalog.py catalog_ru.json
 """
-import json, math, sys
+import json, math, sys, shutil
 from pathlib import Path
 
 CHUNK_SIZE=100
@@ -16,13 +16,17 @@ if not src.exists():
 root=Path(__file__).resolve().parent
 data_dir=root/"data"
 chunks=data_dir/"chunks"
+
+# Always remove ALL previously generated catalog data first.
+# This prevents stale index/chunk files from surviving between catalog versions.
+if data_dir.exists():
+    shutil.rmtree(data_dir)
 chunks.mkdir(parents=True,exist_ok=True)
 
-# clear old chunks
-for p in chunks.glob("*.json"):
-    p.unlink()
-
 catalog=json.loads(src.read_text(encoding="utf-8"))
+if not isinstance(catalog,list):
+    raise SystemExit("catalog_ru.json must contain a JSON array")
+
 index=[]
 
 for chunk_no in range(math.ceil(len(catalog)/CHUNK_SIZE)):
@@ -48,4 +52,5 @@ for chunk_no in range(math.ceil(len(catalog)/CHUNK_SIZE)):
     json.dumps(index,ensure_ascii=False,separators=(",",":")),
     encoding="utf-8"
 )
-print(f"Built {len(catalog)} products into {math.ceil(len(catalog)/CHUNK_SIZE)} chunks.")
+
+print(f"Clean rebuild complete: {len(catalog)} products, {math.ceil(len(catalog)/CHUNK_SIZE)} chunks.")
