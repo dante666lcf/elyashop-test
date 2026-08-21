@@ -1,4 +1,4 @@
-const state={all:[],filtered:[],page:1,perPage:40,defaultOrder:new Map()};
+const state={all:[],filtered:[],page:1,perPage:40,chunkCache:new Map(),defaultOrder:new Map()};
 const $=id=>document.getElementById(id);
 const els={
   grid:$('grid'),status:$('status'),search:$('search'),sort:$('sort'),reset:$('reset'),
@@ -30,22 +30,21 @@ function render(){
   els.status.textContent=items.length?'':'Ничего не найдено';
 
   items.forEach(item=>{
-    const firstImage=(item.images&&item.images[0])||'';
     const card=document.createElement('article');
     card.className='card';
     card.innerHTML=`
-      <div class="pic"><img alt="${esc(item.title||'Товар')}" loading="lazy" data-src="${esc(firstImage)}"></div>
+      <div class="pic"><img alt="${esc(item.title||'Товар')}" loading="lazy" data-src="${esc(item.first_image||'')}"></div>
       <div class="card-body">
         <h3 class="card-title">${esc(item.title||'Товар')}</h3>
         <div class="card-row">
           <span>${item.price?esc(item.price):'Цена по запросу'}</span>
-          <span>${item.image_count||(item.images?.length||0)} фото</span>
+          <span>${item.image_count||0} фото</span>
         </div>
       </div>`;
     card.addEventListener('click',()=>openProduct(item));
     els.grid.appendChild(card);
     const img=card.querySelector('img');
-    if(firstImage)observer.observe(img);
+    if(item.first_image)observer.observe(img);
   });
 
   const pages=Math.max(1,Math.ceil(state.filtered.length/state.perPage));
@@ -58,46 +57,65 @@ function render(){
 function apply(){
   const q=els.search.value.trim().toLowerCase();
   state.filtered=state.all.filter(item=>
-    `${item.title||''} ${item.goods_id||''} ${item.sizes||''}`.toLowerCase().includes(q)
+    `${item.title||''} ${item.id||''} ${item.sizes||''}`.toLowerCase().includes(q)
   );
 
   if(els.sort.value==='name'){
     state.filtered.sort((a,b)=>(a.title||'').localeCompare(b.title||'','ru'));
   }else if(els.sort.value==='photos'){
-    state.filtered.sort((a,b)=>(b.image_count||b.images?.length||0)-(a.image_count||a.images?.length||0));
+    state.filtered.sort((a,b)=>(b.image_count||0)-(a.image_count||0));
   }else{
-    state.filtered.sort((a,b)=>(state.defaultOrder.get(a.goods_id)||0)-(state.defaultOrder.get(b.goods_id)||0));
+    state.filtered.sort((a,b)=>(state.defaultOrder.get(a.id)||0)-(state.defaultOrder.get(b.id)||0));
   }
   state.page=1;
   render();
 }
 
-function openProduct(p){
-  const images=Array.isArray(p.images)?p.images:[];
-  els.productTitle.textContent=p.title||'Товар';
-  els.productPrice.textContent=p.price||'Цена по запросу';
-  els.productSizes.textContent=p.sizes?`Размеры: ${p.sizes}`:'';
-  els.productMeta.textContent=`${p.image_count||images.length||0} фото${p.goods_id?' · ID '+p.goods_id:''}`;
-  els.thumbs.innerHTML='';
-  els.mainImage.src=images[0]||'';
-  els.mainImage.alt=p.title||'Товар';
+async function getChunk(chunkNo){
+  if(state.chunkCache.has(chunkNo))return state.chunkCache.get(chunkNo);
+  const filename=String(chunkNo).padStart(4,'0');
+  const response=await fetch(`/data/chunks/${filename}.json`);
+  if(!response.ok)throw new Error(`Не удалось загрузить товар: HTTP ${response.status}`);
+  const data=await response.json();
+  state.chunkCache.set(chunkNo,data);
+  return data;
+}
 
-  images.forEach((src,i)=>{
-    const img=document.createElement('img');
-    img.loading='lazy';
-    img.src=src;
-    img.alt=`${p.title||'Товар'} — фото ${i+1}`;
-    if(i===0)img.classList.add('active');
-    img.addEventListener('click',()=>{
-      els.mainImage.src=src;
-      els.thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
-      img.classList.add('active');
+async function openProduct(meta){
+  try{
+    const chunk=await getChunk(meta.chunk);
+    const p=chunk[meta.offset];
+    if(!p)throw new Error('Товар не найден');
+
+    const images=Array.isArray(p.images)?p.images:[];
+    els.productTitle.textContent=p.title||'Товар';
+    els.productPrice.textContent=p.price||'Цена по запросу';
+    els.productSizes.textContent=p.sizes?`Размеры: ${p.sizes}`:'';
+    els.productMeta.textContent=`${p.image_count||images.length||0} фото${p.goods_id?' · ID '+p.goods_id:''}`;
+    els.thumbs.innerHTML='';
+    els.mainImage.src=images[0]||'';
+    els.mainImage.alt=p.title||'Товар';
+
+    images.forEach((src,i)=>{
+      const img=document.createElement('img');
+      img.loading='lazy';
+      img.src=src;
+      img.alt=`${p.title||'Товар'} — фото ${i+1}`;
+      if(i===0)img.classList.add('active');
+      img.addEventListener('click',()=>{
+        els.mainImage.src=src;
+        els.thumbs.querySelectorAll('img').forEach(x=>x.classList.remove('active'));
+        img.classList.add('active');
+      });
+      els.thumbs.appendChild(img);
     });
-    els.thumbs.appendChild(img);
-  });
 
-  els.modal.classList.remove('hidden');
-  document.body.style.overflow='hidden';
+    els.modal.classList.remove('hidden');
+    document.body.style.overflow='hidden';
+  }catch(error){
+    console.error(error);
+    alert('Не удалось открыть товар. Попробуйте ещё раз.');
+  }
 }
 
 function closeModal(){
@@ -115,19 +133,19 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 (async()=>{
   try{
-    const response=await fetch('/catalog_ru_1000.json',{cache:'no-store'});
+    const response=await fetch('/data/index.json');
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const catalog=await response.json();
-    if(!Array.isArray(catalog))throw new Error('Неверный формат каталога');
+    const index=await response.json();
+    if(!Array.isArray(index))throw new Error('Неверный формат индекса');
 
-    state.all=catalog;
-    state.defaultOrder=new Map(catalog.map((item,index)=>[item.goods_id,index]));
-    state.filtered=[...catalog];
+    state.all=index;
+    state.defaultOrder=new Map(index.map((item,i)=>[item.id,i]));
+    state.filtered=[...index];
     els.status.textContent='';
     render();
   }catch(error){
     console.error(error);
-    els.status.textContent='Каталог временно недоступен. Обновите страницу.';
+    els.status.textContent='Каталог обновляется. Попробуйте обновить страницу через минуту.';
     els.count.textContent='0 товаров';
   }
 })();
